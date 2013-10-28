@@ -253,8 +253,7 @@ namespace D3DPlugin
         m_nTextureMode = HTM_NONE;
         m_pTempTex = NULL;
 
-        // since 3.4.0 had EF_Query included again the DX9 search is now deprecated but still included for reference
-        m_pDevice = FindD3D9Device( ( INT_PTR )gEnv->pRenderer, gEnv->pRenderer->EF_Query( EFQ_D3DDevice ) );
+        m_pDevice = FindD3D9Device( ( INT_PTR )gEnv->pRenderer, NULL );
 
         if ( m_pDevice )
         {
