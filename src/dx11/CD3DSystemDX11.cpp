@@ -341,10 +341,9 @@ namespace D3DPlugin
 
         if ( bFirstCall )
         {
-            // TODO: Fix these offsets once CE 3.5+ starts working in x64 mode
-            dxdata[0] = 0x000000000001ce3c;
-            dxdata[1] = 0x0000000000002f30;
-            dxdata[2] = 0x0000000000002f00;
+            dxdata[0] = 0x0000000000011AB8;
+            dxdata[1] = 0x0000000000009738;
+            dxdata[2] = 0x0000000000009728;
         }
 
 #else
@@ -407,7 +406,11 @@ namespace D3DPlugin
 
         m_pDeviceCtx = NULL;
         m_pSwapChain = NULL; // FindDXGISwapChain( ( INT_PTR )gEnv->pRenderer );
-        m_pDevice = FindD3D11Device( ( INT_PTR )gEnv->pRenderer, NULL );
+        void* pTrialDevice = NULL;
+#if CDK_VERSION < 354
+        pTrialDevice = gEnv->pRenderer->EF_Query( EFQ_D3DDevice );
+#endif
+        m_pDevice = FindD3D11Device( ( INT_PTR )gEnv->pRenderer, pTrialDevice );
 
         // Hook Swap Chain
         if ( m_pDevice )
