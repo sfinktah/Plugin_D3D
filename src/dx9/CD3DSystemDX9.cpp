@@ -215,8 +215,7 @@ namespace D3DPlugin
         // Check saved/default memory offsets
         if ( !pRet )
         {
-            if ( CheckForInterface<IUnknown>( pInterfaceClass, dxdata, dxdatalen, __uuidof( IDirect3DDevice9 ), nFunctioncount ) );
-
+            if ( CheckForInterface<IUnknown>( pInterfaceClass, dxdata, dxdatalen, __uuidof( IDirect3DDevice9 ), nFunctioncount ) )
             {
                 pRet = *static_cast<IDirect3DDevice9**>( pInterfaceClass );
             }

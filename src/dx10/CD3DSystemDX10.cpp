@@ -105,7 +105,7 @@ INJECTTEXTURE:
 #undef METHOD
 #undef INTERFACE
 
-bool BootstrapD3D10SwapChainHook( )
+bool GetD3D10DeviceData( INT_PTR* unkdata, int nDatalen, void* pParam )
 {
     bool bRet = false;
     HWND hWndDummy = CreateWindowEx( NULL, TEXT( "Message" ), TEXT( "DummyWindow" ), WS_MINIMIZE, 0, 0, 8, 8, HWND_MESSAGE, NULL, 0, NULL );
@@ -153,7 +153,26 @@ bool BootstrapD3D10SwapChainHook( )
     if ( SUCCEEDED( hr ) )
     {
         bRet = true;
-        hookVT( pSwapChain, IDXGISwapChain, Present );
+
+        if ( pParam && *( ( bool* )pParam ) )
+        {
+            hookVT( pSwapChain, IDXGISwapChain, Present );
+        }
+    }
+
+    if ( bRet && unkdata )
+    {
+        void** vt = getVT( pDevice );
+
+        if ( vt )
+        {
+            memcpy( unkdata, vt, nDatalen );
+        }
+
+        else
+        {
+            bRet = false;
+        }
     }
 
     SAFE_RELEASE( pSwapChain );
@@ -162,6 +181,12 @@ bool BootstrapD3D10SwapChainHook( )
     DestroyWindow( hWndDummy );
 
     return bRet;
+}
+
+bool BootstrapD3D10SwapChainHook()
+{
+    bool bHook = true;
+    return GetD3D10DeviceData( NULL, 0, &bHook );
 }
 
 namespace D3DPlugin
@@ -194,71 +219,101 @@ namespace D3DPlugin
             return NULL;
         }
 
-        return ( ID3D10Device* )pTrialDevice;
+        if ( pTrialDevice )
+        {
+            return ( ID3D10Device* )pTrialDevice;
+        }
 
-        /*
-            // Not required for DX10, Device can be retrieved via SwapChain
+        // Set Defaults
+#ifdef _WIN64
+        static INT_PTR      dxoffset    = 0xF60; // placeholder
+#else
+        static INT_PTR      dxoffset    = 0xF54; // placeholder
+#endif
 
-            // Set Defaults
-            static INT_PTR      dxoffset    = 0xC00 + sizeof(INT_PTR);
-            static DWORD        dxoffsetlen = sizeof(dxoffset);
+        static DWORD        dxoffsetlen = sizeof( dxoffset );
 
-            static INT_PTR      dxdata[3];
-            static DWORD        dxdatalen   = sizeof(dxdata);
+        static INT_PTR      dxdata[3];
+        static DWORD        dxdatalen   = sizeof( dxdata );
 
-            static bool bFirstCall = true;
+        static bool bFirstCall = true;
 
-        #ifdef _WIN64
-            static LPCTSTR sSubKeyData = D3D_DATA SEP D3D_TARGETX64 SEP D3D_TARGETDX10;
-            static LPCTSTR sSubKeyOffset = D3D_OFFSET SEP D3D_TARGETX64 SEP D3D_TARGETDX10;
-            if(bFirstCall)
+#ifdef _WIN64
+        static LPCTSTR sSubKeyData = D3D_DATA SEP D3D_TARGETX64 SEP D3D_TARGETDX10;
+        static LPCTSTR sSubKeyOffset = D3D_OFFSET SEP D3D_TARGETX64 SEP D3D_TARGETDX10;
+
+        if ( bFirstCall )
+        {
+            dxdata[0] = 0x0000000000011AB8; // placeholder
+            dxdata[1] = 0x0000000000009738;
+            dxdata[2] = 0x0000000000009728;
+        }
+
+#else
+        static LPCTSTR sSubKeyData = D3D_DATA SEP D3D_TARGETX86 SEP D3D_TARGETDX10;
+        static LPCTSTR sSubKeyOffset = D3D_OFFSET SEP D3D_TARGETX86 SEP D3D_TARGETDX10;
+
+        if ( bFirstCall )
+        {
+            dxdata[0] = 0x0001230B; // placeholder
+            dxdata[1] = 0x000099B0;
+            dxdata[2] = 0x000099A1;
+        }
+
+#endif
+        bFirstCall = false;
+
+        void* pInterfaceClass = ( void* )( nRelativeBase + dxoffset );
+        int nFunctioncount = 98; //dx10
+
+        ID3D10Device* pRet = NULL;
+
+        // Calculate Offsets of IUnknown Interface VTable
+        dxdata[0] += nModuleOffset;
+        dxdata[1] += nModuleOffset;
+        dxdata[2] += nModuleOffset;
+
+        // Check EF_Query/Trial (should always be correct unless CDK decides its private again or faulty)
+        if ( pTrialDevice )
+        {
+            if ( CheckForInterface<IUnknown>( &pTrialDevice, dxdata, dxdatalen, __uuidof( ID3D10Device ), nFunctioncount ) )
             {
-                dxdata[0] = 0x000000000001ce3c;
-                dxdata[1] = 0x0000000000002f30;
-                dxdata[2] = 0x0000000000002f00;
+                pRet = static_cast<ID3D10Device*>( pTrialDevice );
             }
-        #else
-            static LPCTSTR sSubKeyData = D3D_DATA SEP D3D_TARGETX86 SEP D3D_TARGETDX10;
-            static LPCTSTR sSubKeyOffset = D3D_OFFSET SEP D3D_TARGETX86 SEP D3D_TARGETDX10;
-            if(bFirstCall)
+        }
+
+        // Check saved/default memory offsets
+        if ( !pRet )
+        {
+            if ( CheckForInterface<IUnknown>( pInterfaceClass, dxdata, dxdatalen, __uuidof( ID3D10Device ), nFunctioncount ) )
             {
-                dxdata[0] = 0x00006F19;
-                dxdata[1] = 0x00006992;
-                dxdata[2] = 0x00006969;
+                pRet = *static_cast<ID3D10Device**>( pInterfaceClass );
             }
-        #endif
-            bFirstCall = false;
+        }
 
-            void* pInterfaceClass = (void*)(nRelativeBase + dxoffset);
-            int nFunctioncount = 98 // dx10 device;
+        dxdata[0] -= nModuleOffset;
+        dxdata[1] -= nModuleOffset;
+        dxdata[2] -= nModuleOffset;
 
-            // Calculate Offsets of IUnknown Interface VTable
-            dxdata[0] += nModuleOffset;
-            dxdata[1] += nModuleOffset;
-            dxdata[2] += nModuleOffset;
-            bool bInterfaceOk = CheckForInterface<IUnknown>(pInterfaceClass, dxdata, dxdatalen, __uuidof(ID3D11Device), nFunctioncount);
-            dxdata[0] -= nModuleOffset;
-            dxdata[1] -= nModuleOffset;
-            dxdata[2] -= nModuleOffset;
-
-            // Offset already found
-            if(bInterfaceOk)
-                return *(ID3D11Device**)pInterfaceClass;
-
+        // Offset already found
+        if ( !pRet )
+        {
             // Search for offset
             return FindInterface<ID3D10Device, IUnknown>(
-                nModuleOffset,
-                nRelativeBase,
-                nFunctioncount,
-                0xFFF,
-                sSubKeyData,
-                dxdata,
-                dxdatalen,
-                sSubKeyOffset,
-                dxoffset,
-                dxoffsetlen,
-                &GetD3D11DeviceData);
-        */
+                       nModuleOffset,
+                       nRelativeBase,
+                       nFunctioncount,
+                       0xFFF,
+                       sSubKeyData,
+                       dxdata,
+                       dxdatalen,
+                       sSubKeyOffset,
+                       dxoffset,
+                       dxoffsetlen,
+                       &GetD3D10DeviceData );
+        }
+
+        return pRet;
     }
 
     CD3DSystem10::CD3DSystem10()
