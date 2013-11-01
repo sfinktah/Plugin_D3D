@@ -1,3 +1,12 @@
+Plugin_D3D 2.0.0 (??.11.2013)
+==============
+Stable Release for CryEngine 3.5.4 (32/64 bit), DX11
+Should still be backward compatible with CryEngine < 3.5, DX9 and DX11 (when compiled with them)
+
+Changes:
+* EF_Query not working atm so migth not work on some systems atm
+* Rudimentary DX10 placeholder code, in search of DX10/DX10.1 users.
+
 Plugin_D3D 1.9.0 (02.03.2013)
 ==============
 Stable Release for CryEngine 3.4.5 (32/64 bit), DX9/DX11

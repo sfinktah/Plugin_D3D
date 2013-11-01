@@ -3,6 +3,7 @@
 #include <StdAfx.h>
 #include "CD3DSystemDX11.h"
 #include "d3d11hook.h"
+#include "../dxgi/dxgihook.h"
 
 #include <CPluginD3D.h>
 
@@ -60,12 +61,8 @@ GEN_HOOK_( void, __in_opt ID3D11GeometryShader* pShader, __in_ecount_opt( NumCla
 {
     CALL_ORGINAL_( , pShader, ppClassInstances, NumClassInstances );
 
-    //FIXME:
-    // Note: this is more of a hack since access to swap chain not yet implemented
-    // (multiple calls for each frame will come through the listener must handle it by registering a OnPostUpdate and setting a dirty flag)
     if ( pShader == NULL && ppClassInstances == NULL && NumClassInstances == 0 )
     {
-        //D3DPlugin::gD3DSystem11->OnPostBeginScene();
         if ( D3DPlugin::gD3DSystem11->m_pSwapChain )
         {
             rehookVT( D3DPlugin::gD3DSystem11->m_pSwapChain, IDXGISwapChain, Present );
@@ -80,7 +77,6 @@ GEN_HOOK_( void, __in_opt ID3D11GeometryShader* pShader, __in_ecount_opt( NumCla
 GEN_HOOK_( void, __in  ID3D11RenderTargetView* pRenderTargetView, __in  const FLOAT ColorRGBA[ 4 ] )
 {
     CALL_ORGINAL_( , pRenderTargetView, ColorRGBA );
-    //D3DPlugin::gD3DSystem11->OnPostBeginScene();
     rehookVT( This, ID3D11DeviceContext, ClearRenderTargetView );
 };
 #undef METHOD
@@ -90,7 +86,6 @@ GEN_HOOK_(  void, __in  ID3D11Asynchronous* pAsync )
 {
     CALL_ORGINAL_( , pAsync );
 
-    //D3DPlugin::gD3DSystem11->OnPostBeginScene();
     rehookVT( This, ID3D11DeviceContext, ClearRenderTargetView );
     rehookVT( This, ID3D11DeviceContext, End );
 }
@@ -354,7 +349,7 @@ namespace D3DPlugin
             bFirstCall = false;
 
             void* pInterfaceClass = (void*)(nRelativeBase + dxoffset);
-            int nFunctioncount = 43;
+            int nFunctioncount = 43; //dx10
 
             // Calculate Offsets of IUnknown Interface VTable
             dxdata[0] += nModuleOffset;

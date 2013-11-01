@@ -4,6 +4,7 @@
 #include <CPluginD3D.h>
 
 #include "dx9/CD3DSystemDX9.h"
+#include "dx10/CD3DSystemDX10.h"
 #include "dx11/CD3DSystemDX11.h"
 
 namespace D3DPlugin
@@ -60,6 +61,15 @@ namespace D3DPlugin
             {
                 m_pDXSystem = new CD3DSystem11();
             }
+
+#if CDK_VERSION >= 350
+
+            else if ( GetModuleHandle( "d3d10.dll" ) && gEnv->pRenderer->GetRenderType() != eRT_DX9 )
+            {
+                m_pDXSystem = new CD3DSystem10();
+            }
+
+#endif
 
             else if ( GetModuleHandle( "d3d9.dll" ) && gEnv->pRenderer->GetRenderType() == eRT_DX9 )
             {
