@@ -268,9 +268,15 @@ namespace D3DPlugin
         m_bD3DHookInstalled = false;
         m_nTextureMode = HTM_NONE;
         m_pTempTex = NULL;
-
         m_pSwapChain = NULL;
-        m_pDevice = FindD3D10Device( ( INT_PTR )gEnv->pRenderer, gEnv->pRenderer->EF_Query( EFQ_D3DDevice ) );
+
+        void* pTrialDevice = NULL;
+#if CDK_VERSION < 350
+        pTrialDevice = gEnv->pRenderer->EF_Query( EFQ_D3DDevice );
+#elif CDK_VERSION > 354
+        pTrialDevice = gEnv->pRenderer->EF_Query( EFQ_D3DDevice, pTrialDevice );
+#endif
+        m_pDevice = FindD3D10Device( ( INT_PTR )gEnv->pRenderer, pTrialDevice );
 
         // Hook Swap Chain
         if ( m_pDevice )

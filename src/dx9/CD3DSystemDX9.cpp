@@ -254,8 +254,10 @@ namespace D3DPlugin
         m_pTempTex = NULL;
 
         void* pTrialDevice = NULL;
-#if CDK_VERSION < 354
+#if CDK_VERSION < 350
         pTrialDevice = gEnv->pRenderer->EF_Query( EFQ_D3DDevice );
+#elif CDK_VERSION > 354
+        pTrialDevice = gEnv->pRenderer->EF_Query( EFQ_D3DDevice, pTrialDevice );
 #endif
         m_pDevice = FindD3D9Device( ( INT_PTR )gEnv->pRenderer, pTrialDevice );
 
