@@ -313,71 +313,82 @@ namespace D3DPlugin
             return NULL;
         }
 
-        return ( ID3D11Device* )pTrialDevice;
+        if ( pTrialDevice )
+        {
+            return ( ID3D11Device* )pTrialDevice;
+        }
 
+        // Not required for DX11, Device can be retrieved via SwapChain
+
+        // Set Defaults
+        //static INT_PTR      dxoffset    = 0xC00 + sizeof( INT_PTR );
+        static INT_PTR      dxoffset    = 0xF54;
+        static DWORD        dxoffsetlen = sizeof( dxoffset );
+
+        static INT_PTR      dxdata[3];
+        static DWORD        dxdatalen   = sizeof( dxdata );
+
+        static bool bFirstCall = true;
+
+#ifdef _WIN64
+        static LPCTSTR sSubKeyData = D3D_DATA SEP D3D_TARGETX64 SEP D3D_TARGETDX11;
+        static LPCTSTR sSubKeyOffset = D3D_OFFSET SEP D3D_TARGETX64 SEP D3D_TARGETDX11;
+
+        if ( bFirstCall )
+        {
+            dxdata[0] = 0x0000000000011AB8;
+            dxdata[1] = 0x0000000000009738;
+            dxdata[2] = 0x0000000000009728;
+        }
+
+#else
+        static LPCTSTR sSubKeyData = D3D_DATA SEP D3D_TARGETX86 SEP D3D_TARGETDX11;
+        static LPCTSTR sSubKeyOffset = D3D_OFFSET SEP D3D_TARGETX86 SEP D3D_TARGETDX11;
+
+        if ( bFirstCall )
+        {
+            dxdata[0] = 0x0001230B;
+            dxdata[1] = 0x000099B0;
+            dxdata[2] = 0x000099A1;
+        }
+
+#endif
+        bFirstCall = false;
+
+        void* pInterfaceClass = ( void* )( nRelativeBase + dxoffset );
+        int nFunctioncount = 43;
+
+        // Calculate Offsets of IUnknown Interface VTable
+        dxdata[0] += nModuleOffset;
+        dxdata[1] += nModuleOffset;
+        dxdata[2] += nModuleOffset;
+        bool bInterfaceOk = CheckForInterface<IUnknown>( pInterfaceClass, dxdata, dxdatalen, __uuidof( ID3D11Device ), nFunctioncount );
+        dxdata[0] -= nModuleOffset;
+        dxdata[1] -= nModuleOffset;
+        dxdata[2] -= nModuleOffset;
+
+        // Offset already found
+        if ( bInterfaceOk )
+        {
+            return *( ID3D11Device** )pInterfaceClass;
+        }
+
+        return NULL;
         /*
-            // Not required for DX11, Device can be retrieved via SwapChain
-
-            // Set Defaults
-            static INT_PTR      dxoffset    = 0xC00 + sizeof(INT_PTR);
-            static DWORD        dxoffsetlen = sizeof(dxoffset);
-
-            static INT_PTR      dxdata[3];
-            static DWORD        dxdatalen   = sizeof(dxdata);
-
-            static bool bFirstCall = true;
-
-        #ifdef _WIN64
-            static LPCTSTR sSubKeyData = D3D_DATA SEP D3D_TARGETX64 SEP D3D_TARGETDX11;
-            static LPCTSTR sSubKeyOffset = D3D_OFFSET SEP D3D_TARGETX64 SEP D3D_TARGETDX11;
-            if(bFirstCall)
-            {
-                dxdata[0] = 0x000000000001ce3c;
-                dxdata[1] = 0x0000000000002f30;
-                dxdata[2] = 0x0000000000002f00;
-            }
-        #else
-            static LPCTSTR sSubKeyData = D3D_DATA SEP D3D_TARGETX86 SEP D3D_TARGETDX11;
-            static LPCTSTR sSubKeyOffset = D3D_OFFSET SEP D3D_TARGETX86 SEP D3D_TARGETDX11;
-            if(bFirstCall)
-            {
-                dxdata[0] = 0x00006F19;
-                dxdata[1] = 0x00006992;
-                dxdata[2] = 0x00006969;
-            }
-        #endif
-            bFirstCall = false;
-
-            void* pInterfaceClass = (void*)(nRelativeBase + dxoffset);
-            int nFunctioncount = 43; //dx10
-
-            // Calculate Offsets of IUnknown Interface VTable
-            dxdata[0] += nModuleOffset;
-            dxdata[1] += nModuleOffset;
-            dxdata[2] += nModuleOffset;
-            bool bInterfaceOk = CheckForInterface<IUnknown>(pInterfaceClass, dxdata, dxdatalen, __uuidof(ID3D11Device), nFunctioncount);
-            dxdata[0] -= nModuleOffset;
-            dxdata[1] -= nModuleOffset;
-            dxdata[2] -= nModuleOffset;
-
-            // Offset already found
-            if(bInterfaceOk)
-                return *(ID3D11Device**)pInterfaceClass;
-
-            // Search for offset
-            return FindInterface<ID3D11Device, IUnknown>(
-                nModuleOffset,
-                nRelativeBase,
-                nFunctioncount,
-                0xFFF,
-                sSubKeyData,
-                dxdata,
-                dxdatalen,
-                sSubKeyOffset,
-                dxoffset,
-                dxoffsetlen,
-                &GetD3D11DeviceData);
-        */
+                // Search for offset
+                return FindInterface<ID3D11Device, IUnknown>(
+                           nModuleOffset,
+                           nRelativeBase,
+                           nFunctioncount,
+                           0xFFF,
+                           sSubKeyData,
+                           dxdata,
+                           dxdatalen,
+                           sSubKeyOffset,
+                           dxoffset,
+                           dxoffsetlen,
+                           &GetD3D11DeviceData );
+                           */
     }
 
     CD3DSystem11::CD3DSystem11()
@@ -390,7 +401,11 @@ namespace D3DPlugin
 
         m_pDeviceCtx = NULL;
         m_pSwapChain = NULL; // FindDXGISwapChain( ( INT_PTR )gEnv->pRenderer );
-        m_pDevice = FindD3D11Device( ( INT_PTR )gEnv->pRenderer, gEnv->pRenderer->EF_Query( EFQ_D3DDevice ) );
+        void* pTrialDevice = NULL;
+#if CDK_VERSION < 354
+        pTrialDevice = gEnv->pRenderer->EF_Query( EFQ_D3DDevice );
+#endif
+        m_pDevice = FindD3D11Device( ( INT_PTR )gEnv->pRenderer, pTrialDevice );
 
         // Hook Swap Chain
         if ( m_pDevice )
