@@ -356,7 +356,7 @@ namespace D3DPlugin
         bFirstCall = false;
 
         void* pInterfaceClass = ( void* )( nRelativeBase + dxoffset );
-        int nFunctioncount = 43;
+        int nFunctioncount = 43; //dx11
 
         // Calculate Offsets of IUnknown Interface VTable
         dxdata[0] += nModuleOffset;
@@ -406,7 +406,7 @@ namespace D3DPlugin
 #if CDK_VERSION < 350
         pTrialDevice = gEnv->pRenderer->EF_Query( EFQ_D3DDevice );
 #elif CDK_VERSION > 354
-        pTrialDevice = gEnv->pRenderer->EF_Query( EFQ_D3DDevice, pTrialDevice );
+        gEnv->pRenderer->EF_Query( EFQ_D3DDevice, pTrialDevice );
 #endif
         m_pDevice = FindD3D11Device( ( INT_PTR )gEnv->pRenderer, pTrialDevice );
 

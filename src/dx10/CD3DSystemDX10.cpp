@@ -274,7 +274,7 @@ namespace D3DPlugin
 #if CDK_VERSION < 350
         pTrialDevice = gEnv->pRenderer->EF_Query( EFQ_D3DDevice );
 #elif CDK_VERSION > 354
-        pTrialDevice = gEnv->pRenderer->EF_Query( EFQ_D3DDevice, pTrialDevice );
+        gEnv->pRenderer->EF_Query( EFQ_D3DDevice, pTrialDevice );
 #endif
         m_pDevice = FindD3D10Device( ( INT_PTR )gEnv->pRenderer, pTrialDevice );
 
@@ -326,19 +326,11 @@ namespace D3DPlugin
                 }
 
                 rehookVT( m_pDevice, ID3D10Device, CreateTexture2D );
-                //rehookVT( m_pDevice, ID3D10Device, GetImmediateContext );
-                //rehookVT( m_pDeviceCtx, ID3D11DeviceContext, ClearRenderTargetView );
-                //rehookVT( m_pDeviceCtx, ID3D11DeviceContext, End );
-                //rehookVT( m_pDeviceCtx, ID3D11DeviceContext, GSSetShader );
             }
 
             else if ( bHook )
             {
                 hookVT( m_pDevice, ID3D10Device, CreateTexture2D );
-                //hookVT( m_pDevice, ID3D10Device, GetImmediateContext );
-                //hookVT( m_pDeviceCtx, ID3D11DeviceContext, ClearRenderTargetView );
-                //hookVT( m_pDeviceCtx, ID3D11DeviceContext, End );
-                //hookVT( m_pDeviceCtx, ID3D11DeviceContext, GSSetShader );
             }
 
             else if ( m_bD3DHookInstalled )
@@ -350,10 +342,6 @@ namespace D3DPlugin
                 }
 
                 unhookVT( m_pDevice, ID3D10Device, CreateTexture2D, false  );
-                //unhookVT( m_pDevice, ID3D10Device, GetImmediateContext, false  );
-                //unhookVT( m_pDeviceCtx, ID3D11DeviceContext, ClearRenderTargetView, false  );
-                //unhookVT( m_pDeviceCtx, ID3D11DeviceContext, End, false  );
-                //unhookVT( m_pDeviceCtx, ID3D11DeviceContext, GSSetShader, false );
             }
 
             m_bD3DHookInstalled = bHook;
