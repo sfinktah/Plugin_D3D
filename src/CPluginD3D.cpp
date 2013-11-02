@@ -62,14 +62,11 @@ namespace D3DPlugin
                 m_pDXSystem = new CD3DSystem11();
             }
 
-#if CDK_VERSION >= 350
-
+            // This isnt used by CE3 instead it uses a DX11 device with reduced feature level
             else if ( GetModuleHandle( "d3d10.dll" ) && gEnv->pRenderer->GetRenderType() != eRT_DX9 )
             {
                 m_pDXSystem = new CD3DSystem10();
             }
-
-#endif
 
             else if ( GetModuleHandle( "d3d9.dll" ) && gEnv->pRenderer->GetRenderType() == eRT_DX9 )
             {

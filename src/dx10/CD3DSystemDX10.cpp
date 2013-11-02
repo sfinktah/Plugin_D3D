@@ -4,6 +4,7 @@
 #include "CD3DSystemDX10.h"
 #include "d3d10hook.h"
 #include "../dxgi/dxgihook.h"
+#include "../dxgi/dxgiutils.hpp"
 
 #include <CPluginD3D.h>
 
@@ -324,6 +325,7 @@ namespace D3DPlugin
         m_nTextureMode = HTM_NONE;
         m_pTempTex = NULL;
         m_pSwapChain = NULL;
+        m_sGPUName = "";
 
         void* pTrialDevice = NULL;
 #if CDK_VERSION < 350
@@ -349,7 +351,10 @@ namespace D3DPlugin
 
         if ( m_pDevice )
         {
-            gPlugin->LogAlways( "DX10 device found" );
+            ID3D10Device* pDevice = ( ID3D10Device* )m_pDevice;
+            m_sGPUName = getGPUName( pDevice );
+
+            gPlugin->LogAlways( "DX10 device found: GPU(%s)", m_sGPUName.c_str() );
         }
 
         else
@@ -421,6 +426,16 @@ namespace D3DPlugin
         m_pTempTex = NULL;
 
         return gEnv->pRenderer->EF_GetTextureByID( iTex );
+    }
+
+    int CD3DSystem10::GetFeatureLevel()
+    {
+        return m_pDevice ? D3D_FEATURE_LEVEL_10_0 : 0;
+    }
+
+    const char* CD3DSystem10::GetGPUName()
+    {
+        return m_sGPUName.c_str();
     }
 
 }

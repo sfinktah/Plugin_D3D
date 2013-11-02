@@ -44,7 +44,10 @@ namespace D3DPlugin
         virtual void* GetDeviceContext() = 0; // >= DX11 only
         virtual void* GetDevice() = 0;
 
+        virtual int GetFeatureLevel() = 0;
         virtual eD3DType GetType() = 0;
+
+        virtual const char* GetGPUName() = 0; // >= DX10 only
 
         virtual ITexture* CreateTexture( void** pD3DTextureDst, int width, int height, int numMips, ETEX_Format eTF, int flags ) = 0;
         virtual ITexture* InjectTexture( void* pD3DTextureSrc, int nWidth, int nHeight, ETEX_Format eTF, int flags ) = 0;

@@ -4,6 +4,7 @@
 #include "CD3DSystemDX11.h"
 #include "d3d11hook.h"
 #include "../dxgi/dxgihook.h"
+#include "../dxgi/dxgiutils.hpp"
 
 #include <CPluginD3D.h>
 
@@ -372,6 +373,8 @@ namespace D3DPlugin
         m_bD3DHookInstalled = false;
         m_nTextureMode = HTM_NONE;
         m_pTempTex = NULL;
+        m_nFeatureLevel = 0;
+        m_sGPUName = "";
 
         m_pDeviceCtx = NULL;
         m_pSwapChain = NULL;
@@ -414,7 +417,10 @@ namespace D3DPlugin
                 gPlugin->LogWarning( "DX11 device context not found" );
             }
 
-            gPlugin->LogAlways( "DX11 device found" );
+            m_nFeatureLevel = pDevice->GetFeatureLevel();
+            m_sGPUName = getGPUName( pDevice );
+
+            gPlugin->LogAlways( "DX11 device found: FeatureLevel(0x%05x) GPU(%s)", int( m_nFeatureLevel ), m_sGPUName.c_str() );
         }
 
         else
@@ -498,6 +504,16 @@ namespace D3DPlugin
         m_pTempTex = NULL;
 
         return gEnv->pRenderer->EF_GetTextureByID( iTex );
+    }
+
+    int CD3DSystem11::GetFeatureLevel()
+    {
+        return m_pDevice ? m_nFeatureLevel : 0;
+    }
+
+    const char* CD3DSystem11::GetGPUName()
+    {
+        return m_sGPUName.c_str();
     }
 
 }

@@ -16,10 +16,13 @@ namespace D3DPlugin
             void hookD3D( bool bHook );
         public:
             int m_nTextureMode;
+            int m_nFeatureLevel;
             void* m_pTempTex;
             void* m_pDevice;
             void* m_pDeviceCtx;
             void* m_pSwapChain;
+
+            string m_sGPUName;
 
             CD3DSystem11();
             virtual ~CD3DSystem11();
@@ -70,6 +73,11 @@ namespace D3DPlugin
             DECLARE_BROADCAST_EVENT( m_vecQueue, OnPreReset );
             DECLARE_BROADCAST_EVENT( m_vecQueue, OnPostReset );
             DECLARE_BROADCAST_EVENT( m_vecQueue, OnPostBeginScene );
+
+            virtual int GetFeatureLevel();
+
+            virtual const char* GetGPUName();
+
     };
 
     extern CD3DSystem11* gD3DSystem11;

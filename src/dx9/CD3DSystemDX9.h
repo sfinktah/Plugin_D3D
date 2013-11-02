@@ -64,6 +64,11 @@ namespace D3DPlugin
             DECLARE_BROADCAST_EVENT( m_vecQueue, OnPreReset );
             DECLARE_BROADCAST_EVENT( m_vecQueue, OnPostReset );
             DECLARE_BROADCAST_EVENT( m_vecQueue, OnPostBeginScene );
+
+            virtual int GetFeatureLevel();
+
+            virtual const char* GetGPUName();
+
     };
 
     extern CD3DSystem9* gD3DSystem9;

@@ -89,6 +89,8 @@ INJECTTEXTURE:
     return hr;
 }
 #undef METHOD
+#undef INTERFACE
+#undef STDMETHOD
 
 bool GetD3D9DeviceData( INT_PTR* unkdata, int nDatalen, void* pParam )
 {
@@ -343,6 +345,17 @@ namespace D3DPlugin
         m_pTempTex = NULL;
 
         return gEnv->pRenderer->EF_GetTextureByID( iTex );
+    }
+
+    int CD3DSystem9::GetFeatureLevel()
+    {
+#define D3D_FEATURE_LEVEL_9_3 0x9300
+        return m_pDevice ? D3D_FEATURE_LEVEL_9_3 : 0;
+    }
+
+    const char* CD3DSystem9::GetGPUName()
+    {
+        return "";
     }
 
 }

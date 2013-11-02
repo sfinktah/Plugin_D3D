@@ -56,6 +56,15 @@ Using a Plugin from a Plugin (Dependency)
 -----------------------------------------
 * See [Plugin SDK Wiki: Plugin Dependencies](https://github.com/hendrikp/Plugin_SDK/wiki/Plugin-Dependencies)
 
+Flownodes
+=========
+* ```D3D_Plugin:Info``` Retrieve Direct3D Informations
+  * In ```Get``` Retrieve the infos
+  * Out ```Hooked``` Is true when the Direct3D Plugin is working correctly
+  * Out ```Renderer``` CryEngine Render Subsystem in use (DX9, DX11)
+  * Out ```Featurelevel``` The FeatureLevel in use (9.3, 10.0, 10.1, 11.0)
+  * Out ```GPU``` The name of the GPU in use
+
 Samples
 =======
 
@@ -95,4 +104,4 @@ base by simply adding it to your project and creating an instance. This event li
 
 This sample will make your rendering window green, but you are free to do something more meaningfull ;)
 
-* [Sample File](sample/D3DPlugin_Sample_impl.h) (include into a cpp file of your choice or paste it there)
+* [Sample File DX9](sample/D3DPlugin_Sample_DX9_impl.h) (include into a cpp file of your choice or paste it there)

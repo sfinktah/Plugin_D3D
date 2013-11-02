@@ -20,6 +20,8 @@ namespace D3DPlugin
             void* m_pDevice;
             void* m_pSwapChain;
 
+            string m_sGPUName;
+
             CD3DSystem10();
             virtual ~CD3DSystem10();
 
@@ -69,6 +71,11 @@ namespace D3DPlugin
             DECLARE_BROADCAST_EVENT( m_vecQueue, OnPreReset );
             DECLARE_BROADCAST_EVENT( m_vecQueue, OnPostReset );
             DECLARE_BROADCAST_EVENT( m_vecQueue, OnPostBeginScene );
+
+            virtual int GetFeatureLevel();
+
+            virtual const char* GetGPUName();
+
     };
 
     extern CD3DSystem10* gD3DSystem10;

@@ -40,6 +40,9 @@
     <Filter Include="Systems\DXGI">
       <UniqueIdentifier>{34af623a-d47b-45e1-8ab9-6793ac61e5c1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Flownodes">
+      <UniqueIdentifier>{a3fe528e-4827-4e17-b58f-c16326abce24}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\readme.md" />
@@ -82,6 +85,9 @@
     <ClCompile Include="..\src\dx10\CD3DSystemDX10.cpp">
       <Filter>Systems\DX10</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Flownodes\CFlowD3DNode.cpp">
+      <Filter>Flownodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\StdAfx.h">
@@ -114,9 +120,6 @@
     <ClInclude Include="..\src\hooktools.h">
       <Filter>utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\sample\D3DPlugin_Sample_impl.h">
-      <Filter>Samples</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\dx10\CD3DSystemDX10.h">
       <Filter>Systems\DX10</Filter>
     </ClInclude>
@@ -125,6 +128,12 @@
     </ClInclude>
     <ClInclude Include="..\src\dxgi\dxgihook.h">
       <Filter>Systems\DXGI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\dxgi\dxgiutils.hpp">
+      <Filter>Systems\DXGI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sample\D3DPlugin_Sample_DX9_impl.h">
+      <Filter>Samples</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
