@@ -145,7 +145,7 @@ template<typename func, typename vttype> bool changeVTEx( void** ppVt, vttype n,
             VirtualProtect( &ppVt[n], sizeof( LPCVOID ), dwOldProtections, &dwOldProtections );
 
             // flush instructions since vtable changed
-            FlushInstructionCache ( GetCurrentProcess (), NULL, 0 );
+            FlushInstructionCache( GetCurrentProcess(), NULL, 0 );
         }
     }
 

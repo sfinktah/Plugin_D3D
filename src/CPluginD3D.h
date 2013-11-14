@@ -64,7 +64,7 @@ namespace D3DPlugin
     * @brief Small helper to clean up the correct system type (but outside the main interface)
     */
     struct IPluginD3DEx :
-        public IPluginD3D
+            public IPluginD3D
     {
         public:
             /**
@@ -125,7 +125,7 @@ namespace D3DPlugin
 
             void* GetConcreteInterface( const char* sInterfaceVersion )
             {
-                return static_cast < IPluginD3D* > ( m_pDXSystem );
+                return static_cast <IPluginD3D*>( m_pDXSystem );
             };
 
             PluginManager::IPluginBase* GetBase()

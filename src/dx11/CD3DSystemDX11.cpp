@@ -83,7 +83,7 @@ GEN_HOOK_( void, __in  ID3D11RenderTargetView* pRenderTargetView, __in  const FL
 #undef METHOD
 
 #define METHOD End
-GEN_HOOK_(  void, __in  ID3D11Asynchronous* pAsync )
+GEN_HOOK_( void, __in  ID3D11Asynchronous* pAsync )
 {
     CALL_ORGINAL_( , pAsync );
 
@@ -139,7 +139,7 @@ INJECTTEXTURE:
 #undef METHOD
 
 #define METHOD GetImmediateContext
-GEN_HOOK_(  void, __out ID3D11DeviceContext** ppImmediateContext )
+GEN_HOOK_( void, __out ID3D11DeviceContext** ppImmediateContext )
 {
     CALL_ORGINAL_( , ppImmediateContext );
 
@@ -158,7 +158,7 @@ bool GetD3D11DeviceData( INT_PTR* unkdata, int nDatalen, void* pParam )
     HMODULE hModule = NULL;
     hModule = GetModuleHandle( "d3d11.dll" );
 
-    typedef HRESULT ( WINAPI * fD3D11CreateDeviceAndSwapChain )(
+    typedef HRESULT( WINAPI * fD3D11CreateDeviceAndSwapChain )(
         _In_   IDXGIAdapter * pAdapter,
         _In_   D3D_DRIVER_TYPE DriverType,
         _In_   HMODULE Software,
@@ -475,10 +475,10 @@ namespace D3DPlugin
                     unhookVT( m_pSwapChain, IDXGISwapChain, Present, false );
                 }
 
-                unhookVT( m_pDevice, ID3D11Device, CreateTexture2D, false  );
-                unhookVT( m_pDevice, ID3D11Device, GetImmediateContext, false  );
-                unhookVT( m_pDeviceCtx, ID3D11DeviceContext, ClearRenderTargetView, false  );
-                unhookVT( m_pDeviceCtx, ID3D11DeviceContext, End, false  );
+                unhookVT( m_pDevice, ID3D11Device, CreateTexture2D, false );
+                unhookVT( m_pDevice, ID3D11Device, GetImmediateContext, false );
+                unhookVT( m_pDeviceCtx, ID3D11DeviceContext, ClearRenderTargetView, false );
+                unhookVT( m_pDeviceCtx, ID3D11DeviceContext, End, false );
                 unhookVT( m_pDeviceCtx, ID3D11DeviceContext, GSSetShader, false );
             }
 

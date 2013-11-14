@@ -63,7 +63,7 @@ using namespace dxgi_unique1;
 #define INTERFACE ID3D10Device
 
 #define METHOD CreateTexture2D
-GEN_HOOK(  __in  const D3D10_TEXTURE2D_DESC* pDesc, __in_xcount_opt( pDesc->MipLevels * pDesc->ArraySize )  const D3D10_SUBRESOURCE_DATA* pInitialData, __out  ID3D10Texture2D** ppTexture2D )
+GEN_HOOK( __in  const D3D10_TEXTURE2D_DESC* pDesc, __in_xcount_opt( pDesc->MipLevels * pDesc->ArraySize )  const D3D10_SUBRESOURCE_DATA* pInitialData, __out  ID3D10Texture2D** ppTexture2D )
 {
     if ( D3DPlugin::gD3DSystem10->m_nTextureMode == HTM_INJECT )
     {
@@ -114,7 +114,7 @@ bool GetD3D10DeviceData( INT_PTR* unkdata, int nDatalen, void* pParam )
     HMODULE hModule = NULL;
     hModule = GetModuleHandle( "d3d10.dll" );
 
-    typedef HRESULT ( WINAPI * fD3D10CreateDeviceAndSwapChain )(
+    typedef HRESULT( WINAPI * fD3D10CreateDeviceAndSwapChain )(
         _In_   IDXGIAdapter * pAdapter,
         _In_   D3D10_DRIVER_TYPE DriverType,
         _In_   HMODULE Software,
@@ -401,7 +401,7 @@ namespace D3DPlugin
                     unhookVT( m_pSwapChain, IDXGISwapChain, Present, false );
                 }
 
-                unhookVT( m_pDevice, ID3D10Device, CreateTexture2D, false  );
+                unhookVT( m_pDevice, ID3D10Device, CreateTexture2D, false );
             }
 
             m_bD3DHookInstalled = bHook;

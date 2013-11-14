@@ -1,4 +1,4 @@
-Plugin_D3D 2.0.0 (03.11.2013)
+Plugin_D3D 2.0.0 (18.11.2013)
 ==============
 Stable Release for CryEngine 3.5.4 (32/64 bit), DX11, DX10, DX10.1
 Backward compatible with CryEngine 3.4.5 (32/64 bit), DX9 and DX11 (when recompiled)
