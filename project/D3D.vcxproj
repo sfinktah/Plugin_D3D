@@ -262,8 +262,7 @@ stylecode.bat</Command>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Link>
     <PreBuildEvent>
-      <Command>cd $(ProjectDir)/../tools
-stylecode.bat</Command>
+      <Command>$(ProjectDir)/../tools/stylecode.bat</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
