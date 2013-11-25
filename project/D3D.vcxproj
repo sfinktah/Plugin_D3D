@@ -198,8 +198,7 @@ stylecode.bat</Command>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>cd $(ProjectDir)/../tools
-stylecode.bat</Command>
+      <Command>$(ProjectDir)/../tools/stylecode.bat</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

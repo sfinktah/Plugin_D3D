@@ -16,3 +16,5 @@ FOR %%i IN (%EXTENSIONS%) DO (
   "%ASTYLE%" --options="%APROFILE%" -RnqZ %~dp0..\src\*.%%i 2> nul
   "%ASTYLE%" --options="%APROFILE%" -RnqZ %~dp0..\inc\*.%%i 2> nul
 )
+
+exit 0

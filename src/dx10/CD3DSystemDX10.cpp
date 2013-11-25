@@ -5,6 +5,7 @@
 #include "d3d10hook.h"
 #include "../dxgi/dxgihook.h"
 #include "../dxgi/dxgiutils.hpp"
+#include "d3dcommon.h"
 
 #include <CPluginD3D.h>
 
