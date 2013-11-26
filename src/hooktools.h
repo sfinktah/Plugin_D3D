@@ -145,7 +145,7 @@ template<typename func, typename vttype> bool changeVTEx( void** ppVt, vttype n,
             VirtualProtect( &ppVt[n], sizeof( LPCVOID ), dwOldProtections, &dwOldProtections );
 
             // flush instructions since vtable changed
-            FlushInstructionCache ( GetCurrentProcess (), NULL, 0 );
+            FlushInstructionCache( GetCurrentProcess(), NULL, 0 );
         }
     }
 
@@ -153,6 +153,7 @@ template<typename func, typename vttype> bool changeVTEx( void** ppVt, vttype n,
 }
 
 #define D3D_TARGETDX9 TEXT("dx9")
+#define D3D_TARGETDX10 TEXT("dx10")
 #define D3D_TARGETDX11 TEXT("dx11")
 
 typedef bool( *ptGetVTData )( INT_PTR*, int, void* );

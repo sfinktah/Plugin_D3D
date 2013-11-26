@@ -30,8 +30,8 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,9,0,0
- PRODUCTVERSION 1,9,0,0
+ FILEVERSION 2,0,0,0
+ PRODUCTVERSION 2,0,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -48,11 +48,11 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "D3D Plugin Project"
             VALUE "FileDescription", "D3D Plugin"
-            VALUE "FileVersion", "1.9.0.0"
+            VALUE "FileVersion", "2.0.0.0"
             VALUE "LegalCopyright", "Plugin_D3D Copyright (c) 2013, The D3D Plugin projects authors, All Rights reserved."
             VALUE "OriginalFilename", "Plugin_D3D.dll"
             VALUE "ProductName", "D3D Plugin for CryEngine SDK"
-            VALUE "ProductVersion", "1.9.0.0"
+            VALUE "ProductVersion", "2.0.0.0"
         END
     END
     BLOCK "VarFileInfo"

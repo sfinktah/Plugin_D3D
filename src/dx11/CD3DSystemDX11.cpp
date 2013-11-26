@@ -3,6 +3,8 @@
 #include <StdAfx.h>
 #include "CD3DSystemDX11.h"
 #include "d3d11hook.h"
+#include "../dxgi/dxgihook.h"
+#include "../dxgi/dxgiutils.hpp"
 
 #include <CPluginD3D.h>
 
@@ -60,12 +62,8 @@ GEN_HOOK_( void, __in_opt ID3D11GeometryShader* pShader, __in_ecount_opt( NumCla
 {
     CALL_ORGINAL_( , pShader, ppClassInstances, NumClassInstances );
 
-    //FIXME:
-    // Note: this is more of a hack since access to swap chain not yet implemented
-    // (multiple calls for each frame will come through the listener must handle it by registering a OnPostUpdate and setting a dirty flag)
     if ( pShader == NULL && ppClassInstances == NULL && NumClassInstances == 0 )
     {
-        //D3DPlugin::gD3DSystem11->OnPostBeginScene();
         if ( D3DPlugin::gD3DSystem11->m_pSwapChain )
         {
             rehookVT( D3DPlugin::gD3DSystem11->m_pSwapChain, IDXGISwapChain, Present );
@@ -80,17 +78,15 @@ GEN_HOOK_( void, __in_opt ID3D11GeometryShader* pShader, __in_ecount_opt( NumCla
 GEN_HOOK_( void, __in  ID3D11RenderTargetView* pRenderTargetView, __in  const FLOAT ColorRGBA[ 4 ] )
 {
     CALL_ORGINAL_( , pRenderTargetView, ColorRGBA );
-    //D3DPlugin::gD3DSystem11->OnPostBeginScene();
     rehookVT( This, ID3D11DeviceContext, ClearRenderTargetView );
 };
 #undef METHOD
 
 #define METHOD End
-GEN_HOOK_(  void, __in  ID3D11Asynchronous* pAsync )
+GEN_HOOK_( void, __in  ID3D11Asynchronous* pAsync )
 {
     CALL_ORGINAL_( , pAsync );
 
-    //D3DPlugin::gD3DSystem11->OnPostBeginScene();
     rehookVT( This, ID3D11DeviceContext, ClearRenderTargetView );
     rehookVT( This, ID3D11DeviceContext, End );
 }
@@ -143,7 +139,7 @@ INJECTTEXTURE:
 #undef METHOD
 
 #define METHOD GetImmediateContext
-GEN_HOOK_(  void, __out ID3D11DeviceContext** ppImmediateContext )
+GEN_HOOK_( void, __out ID3D11DeviceContext** ppImmediateContext )
 {
     CALL_ORGINAL_( , ppImmediateContext );
 
@@ -154,7 +150,7 @@ GEN_HOOK_(  void, __out ID3D11DeviceContext** ppImmediateContext )
 #undef METHOD
 #undef INTERFACE
 
-bool BootstrapD3D11SwapChainHook( )
+bool GetD3D11DeviceData( INT_PTR* unkdata, int nDatalen, void* pParam )
 {
     bool bRet = false;
     HWND hWndDummy = CreateWindowEx( NULL, TEXT( "Message" ), TEXT( "DummyWindow" ), WS_MINIMIZE, 0, 0, 8, 8, HWND_MESSAGE, NULL, 0, NULL );
@@ -162,7 +158,7 @@ bool BootstrapD3D11SwapChainHook( )
     HMODULE hModule = NULL;
     hModule = GetModuleHandle( "d3d11.dll" );
 
-    typedef HRESULT ( WINAPI * fD3D11CreateDeviceAndSwapChain )(
+    typedef HRESULT( WINAPI * fD3D11CreateDeviceAndSwapChain )(
         _In_   IDXGIAdapter * pAdapter,
         _In_   D3D_DRIVER_TYPE DriverType,
         _In_   HMODULE Software,
@@ -210,27 +206,27 @@ bool BootstrapD3D11SwapChainHook( )
     if ( SUCCEEDED( hr ) )
     {
         bRet = true;
-        hookVT( pSwapChain, IDXGISwapChain, Present );
+
+        if ( pParam && *( ( bool* )pParam ) )
+        {
+            hookVT( pSwapChain, IDXGISwapChain, Present );
+        }
     }
 
-    /*
-        INT_PTR* unkdata, int nDatalen, void* pParam;
+    if ( bRet && unkdata )
+    {
+        void** vt = getVT( pDevice );
 
-        if ( bRet && nDatalen > 0 && unkdata )
+        if ( vt )
         {
-            void** vt = getVT( pSwapChain );
-
-            if ( vt )
-            {
-                memcpy( unkdata, vt, nDatalen );
-            }
-
-            else
-            {
-                bRet = false;
-            }
+            memcpy( unkdata, vt, nDatalen );
         }
-    */
+
+        else
+        {
+            bRet = false;
+        }
+    }
 
     SAFE_RELEASE( pSwapChain );
     SAFE_RELEASE( pDevice );
@@ -239,6 +235,12 @@ bool BootstrapD3D11SwapChainHook( )
     DestroyWindow( hWndDummy );
 
     return bRet;
+}
+
+bool BootstrapD3D11SwapChainHook()
+{
+    bool bHook = true;
+    return GetD3D11DeviceData( NULL, 0, &bHook );
 }
 
 namespace D3DPlugin
@@ -255,57 +257,6 @@ namespace D3DPlugin
 
         // atm search is not needed since we receive swap chain through present
         return NULL;
-
-        /*
-                        // Not needed anymore DX11/DXGI is easier to handle (by creating Dummy SwapChain)
-
-                        // Set Defaults
-                        static INT_PTR dxoffset = 0xC00 + sizeof( INT_PTR );
-                        static DWORD dxoffsetlen = sizeof( dxoffset );
-
-                        static INT_PTR dxdata[3];
-                        static DWORD dxdatalen = sizeof( dxdata );
-
-                        static bool bFirstCall = true;
-
-                #ifdef _WIN64
-                        static LPCTSTR sSubKeyData = D3D_DATA SEP D3D_TARGETX64 SEP D3D_TARGETDX11;
-                        static LPCTSTR sSubKeyOffset = D3D_OFFSET SEP D3D_TARGETX64 SEP D3D_TARGETDX11;
-
-                        if ( bFirstCall )
-                        {
-                            dxdata[0] = 0x0;
-                            dxdata[1] = 0x0;
-                            dxdata[2] = 0x0;
-                        }
-
-                #else
-                        static LPCTSTR sSubKeyData = D3D_DATA SEP D3D_TARGETX86 SEP D3D_TARGETDX11;
-                        static LPCTSTR sSubKeyOffset = D3D_OFFSET SEP D3D_TARGETX86 SEP D3D_TARGETDX11;
-
-                        if ( bFirstCall )
-                        {
-                            dxdata[0] = 0x0;
-                            dxdata[1] = 0x0;
-                            dxdata[2] = 0x0;
-                        }
-
-                #endif
-                        int nFunctioncount = 18;
-
-                        return FindInterface<IDXGISwapChain, IUnknown>(
-                                   nModuleOffset,
-                                   nRelativeBase,
-                                   nFunctioncount,
-                                   0xFFF,
-                                   "",
-                                   dxdata,
-                                   dxdatalen,
-                                   "",
-                                   dxoffset,
-                                   dxoffsetlen,
-                                   &GetD3D11DeviceData );
-        */
     }
 
     ID3D11Device* FindD3D11Device( INT_PTR nRelativeBase, void* pTrialDevice )
@@ -323,11 +274,13 @@ namespace D3DPlugin
             return ( ID3D11Device* )pTrialDevice;
         }
 
-        // Not required for DX11, Device can be retrieved via SwapChain
-
         // Set Defaults
-        //static INT_PTR      dxoffset    = 0xC00 + sizeof( INT_PTR );
+#ifdef _WIN64
+        static INT_PTR      dxoffset    = 0xF60;
+#else
         static INT_PTR      dxoffset    = 0xF54;
+#endif
+
         static DWORD        dxoffsetlen = sizeof( dxoffset );
 
         static INT_PTR      dxdata[3];
@@ -361,39 +314,56 @@ namespace D3DPlugin
         bFirstCall = false;
 
         void* pInterfaceClass = ( void* )( nRelativeBase + dxoffset );
-        int nFunctioncount = 43;
+        int nFunctioncount = 43; //dx11
+
+        ID3D11Device* pRet = NULL;
 
         // Calculate Offsets of IUnknown Interface VTable
         dxdata[0] += nModuleOffset;
         dxdata[1] += nModuleOffset;
         dxdata[2] += nModuleOffset;
-        bool bInterfaceOk = CheckForInterface<IUnknown>( pInterfaceClass, dxdata, dxdatalen, __uuidof( ID3D11Device ), nFunctioncount );
+
+        // Check EF_Query/Trial (should always be correct unless CDK decides its private again or faulty)
+        if ( pTrialDevice )
+        {
+            if ( CheckForInterface<IUnknown>( &pTrialDevice, dxdata, dxdatalen, __uuidof( ID3D11Device ), nFunctioncount ) )
+            {
+                pRet = static_cast<ID3D11Device*>( pTrialDevice );
+            }
+        }
+
+        // Check saved/default memory offsets
+        if ( !pRet )
+        {
+            if ( CheckForInterface<IUnknown>( pInterfaceClass, dxdata, dxdatalen, __uuidof( ID3D11Device ), nFunctioncount ) )
+            {
+                pRet = *static_cast<ID3D11Device**>( pInterfaceClass );
+            }
+        }
+
         dxdata[0] -= nModuleOffset;
         dxdata[1] -= nModuleOffset;
         dxdata[2] -= nModuleOffset;
 
         // Offset already found
-        if ( bInterfaceOk )
+        if ( !pRet )
         {
-            return *( ID3D11Device** )pInterfaceClass;
+            // Search for offset
+            return FindInterface<ID3D11Device, IUnknown>(
+                       nModuleOffset,
+                       nRelativeBase,
+                       nFunctioncount,
+                       0xFFF,
+                       sSubKeyData,
+                       dxdata,
+                       dxdatalen,
+                       sSubKeyOffset,
+                       dxoffset,
+                       dxoffsetlen,
+                       &GetD3D11DeviceData );
         }
 
-        return NULL;
-        /*
-                // Search for offset
-                return FindInterface<ID3D11Device, IUnknown>(
-                           nModuleOffset,
-                           nRelativeBase,
-                           nFunctioncount,
-                           0xFFF,
-                           sSubKeyData,
-                           dxdata,
-                           dxdatalen,
-                           sSubKeyOffset,
-                           dxoffset,
-                           dxoffsetlen,
-                           &GetD3D11DeviceData );
-                           */
+        return pRet;
     }
 
     CD3DSystem11::CD3DSystem11()
@@ -403,12 +373,17 @@ namespace D3DPlugin
         m_bD3DHookInstalled = false;
         m_nTextureMode = HTM_NONE;
         m_pTempTex = NULL;
+        m_nFeatureLevel = 0;
+        m_sGPUName = "";
 
         m_pDeviceCtx = NULL;
-        m_pSwapChain = NULL; // FindDXGISwapChain( ( INT_PTR )gEnv->pRenderer );
+        m_pSwapChain = NULL;
+
         void* pTrialDevice = NULL;
-#if CDK_VERSION < 354
+#if CDK_VERSION < 350
         pTrialDevice = gEnv->pRenderer->EF_Query( EFQ_D3DDevice );
+#elif CDK_VERSION > 354
+        gEnv->pRenderer->EF_Query( EFQ_D3DDevice, pTrialDevice );
 #endif
         m_pDevice = FindD3D11Device( ( INT_PTR )gEnv->pRenderer, pTrialDevice );
 
@@ -442,23 +417,16 @@ namespace D3DPlugin
                 gPlugin->LogWarning( "DX11 device context not found" );
             }
 
-            gPlugin->LogAlways( "DX11 device found" );
+            m_nFeatureLevel = pDevice->GetFeatureLevel();
+            m_sGPUName = getGPUName( pDevice );
+
+            gPlugin->LogAlways( "DX11 device found: FeatureLevel(0x%05x) GPU(%s)", int( m_nFeatureLevel ), m_sGPUName.c_str() );
         }
 
         else
         {
             gPlugin->LogWarning( "DX11 device not found" );
         }
-
-        /*
-            // Alternative Method would only work on Debug devices..
-            ID3D11Debug*            pDbgDevice = NULL;
-            HRESULT hr = pDevice->QueryInterface(__uuidof(ID3D11Debug), (void**)&pDbgDevice);
-
-            IDXGISwapChain*         pSwapChain = NULL;
-            if(pDbgDevice)
-                hr = pDbgDevice->GetSwapChain(&pSwapChain);
-        */
     }
 
     CD3DSystem11::~CD3DSystem11()
@@ -492,12 +460,6 @@ namespace D3DPlugin
 
             else if ( bHook )
             {
-                // This way isn't possible. Only via bootstrap
-                //if ( m_pSwapChain )
-                //{
-                //    hookVT( m_pSwapChain, IDXGISwapChain, Present );
-                //}
-
                 hookVT( m_pDevice, ID3D11Device, CreateTexture2D );
                 hookVT( m_pDevice, ID3D11Device, GetImmediateContext );
                 hookVT( m_pDeviceCtx, ID3D11DeviceContext, ClearRenderTargetView );
@@ -513,10 +475,10 @@ namespace D3DPlugin
                     unhookVT( m_pSwapChain, IDXGISwapChain, Present, false );
                 }
 
-                unhookVT( m_pDevice, ID3D11Device, CreateTexture2D, false  );
-                unhookVT( m_pDevice, ID3D11Device, GetImmediateContext, false  );
-                unhookVT( m_pDeviceCtx, ID3D11DeviceContext, ClearRenderTargetView, false  );
-                unhookVT( m_pDeviceCtx, ID3D11DeviceContext, End, false  );
+                unhookVT( m_pDevice, ID3D11Device, CreateTexture2D, false );
+                unhookVT( m_pDevice, ID3D11Device, GetImmediateContext, false );
+                unhookVT( m_pDeviceCtx, ID3D11DeviceContext, ClearRenderTargetView, false );
+                unhookVT( m_pDeviceCtx, ID3D11DeviceContext, End, false );
                 unhookVT( m_pDeviceCtx, ID3D11DeviceContext, GSSetShader, false );
             }
 
@@ -542,6 +504,16 @@ namespace D3DPlugin
         m_pTempTex = NULL;
 
         return gEnv->pRenderer->EF_GetTextureByID( iTex );
+    }
+
+    int CD3DSystem11::GetFeatureLevel()
+    {
+        return m_pDevice ? m_nFeatureLevel : 0;
+    }
+
+    const char* CD3DSystem11::GetGPUName()
+    {
+        return m_sGPUName.c_str();
     }
 
 }

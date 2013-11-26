@@ -14,6 +14,7 @@ namespace D3DPlugin
         D3D_NONE,
         D3D_DX9,
         D3D_DX11,
+        D3D_DX10,
     };
 
     struct ID3DEventListener
@@ -39,11 +40,14 @@ namespace D3DPlugin
         virtual void RegisterListener( ID3DEventListener* item ) = 0;
         virtual void UnregisterListener( ID3DEventListener* item ) = 0;
 
-        virtual void* GetSwapChain() = 0; // DX11 only
-        virtual void* GetDeviceContext() = 0; // DX11 only
+        virtual void* GetSwapChain() = 0; // >= DX10 only
+        virtual void* GetDeviceContext() = 0; // >= DX11 only
         virtual void* GetDevice() = 0;
 
+        virtual int GetFeatureLevel() = 0;
         virtual eD3DType GetType() = 0;
+
+        virtual const char* GetGPUName() = 0; // >= DX10 only
 
         virtual ITexture* CreateTexture( void** pD3DTextureDst, int width, int height, int numMips, ETEX_Format eTF, int flags ) = 0;
         virtual ITexture* InjectTexture( void* pD3DTextureSrc, int nWidth, int nHeight, ETEX_Format eTF, int flags ) = 0;

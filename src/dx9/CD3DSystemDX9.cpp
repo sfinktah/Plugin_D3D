@@ -89,6 +89,8 @@ INJECTTEXTURE:
     return hr;
 }
 #undef METHOD
+#undef INTERFACE
+#undef STDMETHOD
 
 bool GetD3D9DeviceData( INT_PTR* unkdata, int nDatalen, void* pParam )
 {
@@ -215,8 +217,7 @@ namespace D3DPlugin
         // Check saved/default memory offsets
         if ( !pRet )
         {
-            if ( CheckForInterface<IUnknown>( pInterfaceClass, dxdata, dxdatalen, __uuidof( IDirect3DDevice9 ), nFunctioncount ) );
-
+            if ( CheckForInterface<IUnknown>( pInterfaceClass, dxdata, dxdatalen, __uuidof( IDirect3DDevice9 ), nFunctioncount ) )
             {
                 pRet = *static_cast<IDirect3DDevice9**>( pInterfaceClass );
             }
@@ -254,8 +255,10 @@ namespace D3DPlugin
         m_pTempTex = NULL;
 
         void* pTrialDevice = NULL;
-#if CDK_VERSION < 354
+#if CDK_VERSION < 350
         pTrialDevice = gEnv->pRenderer->EF_Query( EFQ_D3DDevice );
+#elif CDK_VERSION > 354
+        gEnv->pRenderer->EF_Query( EFQ_D3DDevice, pTrialDevice );
 #endif
         m_pDevice = FindD3D9Device( ( INT_PTR )gEnv->pRenderer, pTrialDevice );
 
@@ -342,6 +345,17 @@ namespace D3DPlugin
         m_pTempTex = NULL;
 
         return gEnv->pRenderer->EF_GetTextureByID( iTex );
+    }
+
+    int CD3DSystem9::GetFeatureLevel()
+    {
+#define D3D_FEATURE_LEVEL_9_3 0x9300
+        return m_pDevice ? D3D_FEATURE_LEVEL_9_3 : 0;
+    }
+
+    const char* CD3DSystem9::GetGPUName()
+    {
+        return "";
     }
 
 }

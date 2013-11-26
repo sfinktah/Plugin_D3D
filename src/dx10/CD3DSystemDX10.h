@@ -6,22 +6,24 @@
 
 namespace D3DPlugin
 {
-    class CD3DSystem9 :
+    class CD3DSystem10 :
         public IPluginD3DEx,
         private ID3DEventListener
     {
         private:
             bool m_bD3DHookInstalled;
             std::vector<ID3DEventListener*> m_vecQueue;
-
             void hookD3D( bool bHook );
         public:
             int m_nTextureMode;
             void* m_pTempTex;
             void* m_pDevice;
+            void* m_pSwapChain;
 
-            CD3DSystem9();
-            virtual ~CD3DSystem9();
+            string m_sGPUName;
+
+            CD3DSystem10();
+            virtual ~CD3DSystem10();
 
             void Release()
             {
@@ -38,20 +40,25 @@ namespace D3DPlugin
                 hookD3D( bActivate );
             };
 
-            void* GetDevice();
             eD3DType GetType()
             {
-                return m_pDevice ? D3D_DX9 : D3D_NONE;
+                return m_pDevice ? D3D_DX10 : D3D_NONE;
+            };
+
+            void* GetDevice()
+            {
+                return m_pDevice;
+            }
+
+            void* GetDeviceContext()
+            {
+                return NULL;
             };
 
             void* GetSwapChain()
             {
-                return NULL;
-            }; // DX11 only
-            void* GetDeviceContext()
-            {
-                return NULL;
-            }; // DX11 only
+                return m_pSwapChain;
+            };
 
             ITexture* CreateTexture( void** pD3DTextureDst, int width, int height, int numMips, ETEX_Format eTF, int flags );
             ITexture* InjectTexture( void* pD3DTextureSrc, int nWidth, int nHeight, ETEX_Format eTF, int flags );
@@ -71,5 +78,5 @@ namespace D3DPlugin
 
     };
 
-    extern CD3DSystem9* gD3DSystem9;
+    extern CD3DSystem10* gD3DSystem10;
 };

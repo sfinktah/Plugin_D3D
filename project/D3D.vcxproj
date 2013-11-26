@@ -33,8 +33,10 @@
   <ItemGroup>
     <ClCompile Include="..\src\CPluginD3D.cpp" />
     <ClCompile Include="..\src\CPluginD3DModule.cpp" />
+    <ClCompile Include="..\src\dx10\CD3DSystemDX10.cpp" />
     <ClCompile Include="..\src\dx11\CD3DSystemDX11.cpp" />
     <ClCompile Include="..\src\dx9\CD3DSystemDX9.cpp" />
+    <ClCompile Include="..\src\Flownodes\CFlowD3DNode.cpp" />
     <ClCompile Include="..\src\StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -44,12 +46,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\inc\IPluginD3D.h" />
-    <ClInclude Include="..\sample\D3DPlugin_Sample_impl.h" />
+    <ClInclude Include="..\sample\D3DPlugin_Sample_DX9_impl.h" />
     <ClInclude Include="..\src\CPluginD3D.h" />
+    <ClInclude Include="..\src\dx10\CD3DSystemDX10.h" />
+    <ClInclude Include="..\src\dx10\d3d10hook.h" />
     <ClInclude Include="..\src\dx11\CD3DSystemDX11.h" />
     <ClInclude Include="..\src\dx11\d3d11hook.h" />
     <ClInclude Include="..\src\dx9\CD3DSystemDX9.h" />
     <ClInclude Include="..\src\dx9\d3d9hook.h" />
+    <ClInclude Include="..\src\dxgi\dxgihook.h" />
+    <ClInclude Include="..\src\dxgi\dxgiutils.hpp" />
     <ClInclude Include="..\src\hooktools.h" />
     <ClInclude Include="..\src\pp_tools.h" />
     <ClInclude Include="..\src\StdAfx.h" />

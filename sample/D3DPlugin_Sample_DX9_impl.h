@@ -4,9 +4,6 @@
 #include <IPluginManager.h>
 #include <IPluginD3D.h>
 #include <d3d9.h>
-#include <dxgi.h>
-#include <d3dcommon.h>
-#include <d3d11.h>
 
 class CMyD3D
     : private D3DPlugin::ID3DEventListener
@@ -18,7 +15,6 @@ protected:
 	{
 		void* ptr;
 		IDirect3DDevice9*	dx9;
-		//ID3D11Device*		dx11;
 	} m_pDevice;
 
     PluginManager::IPluginBase* m_pD3DPlugin;

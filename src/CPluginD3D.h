@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include <IPluginBase.h>
 #include <Game.h>
 
 #include <IPluginManager.h>
-#include <IPluginBase.h>
 #include <CPluginBase.hpp>
 
 #include <IPluginD3D.h>
@@ -64,7 +64,7 @@ namespace D3DPlugin
     * @brief Small helper to clean up the correct system type (but outside the main interface)
     */
     struct IPluginD3DEx :
-        public IPluginD3D
+            public IPluginD3D
     {
         public:
             /**
@@ -98,7 +98,7 @@ namespace D3DPlugin
 
             const char* GetVersion() const
             {
-                return "1.9.0.0";
+                return "2.0.0.0";
             };
 
             const char* GetName() const
@@ -125,7 +125,7 @@ namespace D3DPlugin
 
             void* GetConcreteInterface( const char* sInterfaceVersion )
             {
-                return static_cast < IPluginD3D* > ( m_pDXSystem );
+                return static_cast <IPluginD3D*>( m_pDXSystem );
             };
 
             PluginManager::IPluginBase* GetBase()

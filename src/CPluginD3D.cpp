@@ -4,6 +4,7 @@
 #include <CPluginD3D.h>
 
 #include "dx9/CD3DSystemDX9.h"
+#include "dx10/CD3DSystemDX10.h"
 #include "dx11/CD3DSystemDX11.h"
 
 namespace D3DPlugin
@@ -59,6 +60,12 @@ namespace D3DPlugin
             if ( GetModuleHandle( "d3d11.dll" ) && gEnv->pRenderer->GetRenderType() == eRT_DX11 )
             {
                 m_pDXSystem = new CD3DSystem11();
+            }
+
+            // This isnt used by CE3 instead it uses a DX11 device with reduced feature level
+            else if ( GetModuleHandle( "d3d10.dll" ) && gEnv->pRenderer->GetRenderType() != eRT_DX9 )
+            {
+                m_pDXSystem = new CD3DSystem10();
             }
 
             else if ( GetModuleHandle( "d3d9.dll" ) && gEnv->pRenderer->GetRenderType() == eRT_DX9 )

@@ -1,3 +1,16 @@
+Plugin_D3D 2.0.0 (18.11.2013)
+==============
+Stable Release for CryEngine 3.5.4 (32/64 bit), DX11, DX10, DX10.1
+Backward compatible with CryEngine 3.4.5 (32/64 bit), DX9 and DX11 (when recompiled)
+
+New:
+* Added DirectX 10 Support
+* Added Support for Featurelevels 10.0 and 10.1
+* Flownode to query DirectX and plugin status information
+
+Changes:
+* Reactivated automatic DirectX Scan since EF_Query is missing again
+
 Plugin_D3D 1.9.0 (02.03.2013)
 ==============
 Stable Release for CryEngine 3.4.5 (32/64 bit), DX9/DX11
