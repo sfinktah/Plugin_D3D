@@ -156,7 +156,7 @@ bool GetD3D11DeviceData( INT_PTR* unkdata, int nDatalen, void* pParam )
     HWND hWndDummy = CreateWindowEx( NULL, TEXT( "Message" ), TEXT( "DummyWindow" ), WS_MINIMIZE, 0, 0, 8, 8, HWND_MESSAGE, NULL, 0, NULL );
 
     HMODULE hModule = NULL;
-    hModule = GetModuleHandle( "d3d11.dll" );
+    hModule = GetModuleHandleA( "d3d11.dll" );
 
     typedef HRESULT( WINAPI * fD3D11CreateDeviceAndSwapChain )(
         _In_   IDXGIAdapter * pAdapter,
@@ -261,7 +261,9 @@ namespace D3DPlugin
 
     ID3D11Device* FindD3D11Device( INT_PTR nRelativeBase, void* pTrialDevice )
     {
-        INT_PTR nModuleOffset = ( INT_PTR )GetModuleHandle( TEXT( "d3d11.dll" ) );
+		gPlugin->LogError("Here: %i", __LINE__);
+		INT_PTR nModuleOffset = (INT_PTR)GetModuleHandle(TEXT("d3d11.dll"));
+		gPlugin->LogError("Here: %i", __LINE__);
 
         if ( !nModuleOffset )
         {
@@ -269,11 +271,14 @@ namespace D3DPlugin
             return NULL;
         }
 
+		gPlugin->LogError("Here: %i", __LINE__);
         if ( pTrialDevice )
         {
+		gPlugin->LogError("Here: %i", __LINE__);
             return ( ID3D11Device* )pTrialDevice;
         }
 
+		gPlugin->LogError("Here: %i", __LINE__);
         // Set Defaults
 #ifdef _WIN64
         static INT_PTR      dxoffset    = 0xF60;
@@ -292,6 +297,7 @@ namespace D3DPlugin
         static LPCTSTR sSubKeyData = D3D_DATA SEP D3D_TARGETX64 SEP D3D_TARGETDX11;
         static LPCTSTR sSubKeyOffset = D3D_OFFSET SEP D3D_TARGETX64 SEP D3D_TARGETDX11;
 
+		gPlugin->LogError("Here: %i", __LINE__);
         if ( bFirstCall )
         {
             dxdata[0] = 0x0000000000011AB8;
@@ -381,13 +387,15 @@ namespace D3DPlugin
 
         void* pTrialDevice = NULL;
 #if CDK_VERSION < 350
-        pTrialDevice = gEnv->pRenderer->EF_Query( EFQ_D3DDevice );
+//        pTrialDevice = gEnv->pRenderer->EF_Query( EFQ_D3DDevice );
 //uncomment when it comes back
 //#elif CDK_VERSION > ?
 // gEnv->pRenderer->EF_Query( EFQ_D3DDevice, pTrialDevice );
 #endif
 
-        m_pDevice = FindD3D11Device( ( INT_PTR )gEnv->pRenderer, pTrialDevice );
+		gPlugin->LogAlways( "Looking for m_pDevice" );
+        m_pDevice = FindD3D11Device( NULL, /* ( INT_PTR )gEnv->pRenderer, */ pTrialDevice );
+		gPlugin->LogAlways( "found: %p", m_pDevice );
 
         // Hook Swap Chain
         if ( m_pDevice )
@@ -490,22 +498,28 @@ namespace D3DPlugin
 
     ITexture* CD3DSystem11::CreateTexture( void** pD3DTextureDst, int width, int height, int numMips, ETEX_Format eTF, int flags )
     {
+		/*
         gD3DSystem11->m_nTextureMode = HTM_CREATE;
         int iTex = gEnv->pRenderer->SF_CreateTexture( width, height, numMips, NULL, eTF, flags ); // Create Texture
         *pD3DTextureDst = m_pTempTex;
         m_pTempTex = NULL;
 
         return gEnv->pRenderer->EF_GetTextureByID( iTex );
+		*/
+		return 0;
     }
 
     ITexture* CD3DSystem11::InjectTexture( void* pD3DTextureSrc, int nWidth, int nHeight, ETEX_Format eTF, int flags )
     {
+		/*
         gD3DSystem11->m_nTextureMode = HTM_INJECT;
         m_pTempTex = pD3DTextureSrc;
         int iTex = gEnv->pRenderer->SF_CreateTexture( nWidth, nHeight, 1, NULL, eTF, flags ); // Create Dummytexture and replace it to trick CE3 into using our texture.
         m_pTempTex = NULL;
 
         return gEnv->pRenderer->EF_GetTextureByID( iTex );
+		*/
+			return 0;
     }
 
     int CD3DSystem11::GetFeatureLevel()

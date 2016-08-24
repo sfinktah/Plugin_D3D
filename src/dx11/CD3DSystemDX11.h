@@ -3,6 +3,7 @@
 #pragma once
 
 #include <CPluginD3D.h>
+#include <ITexture.h>
 
 namespace D3DPlugin
 {
@@ -52,14 +53,29 @@ namespace D3DPlugin
                 return m_pDevice;
             }
 
+            void* SetDevice(void *device)
+            {
+                return (m_pDevice = device);
+            }
+
             void* GetDeviceContext()
             {
                 return m_pDeviceCtx;
             };
 
+            void* SetDeviceContext(void *context)
+            {
+                return (m_pDeviceCtx = context);
+            };
+
             void* GetSwapChain()
             {
                 return m_pSwapChain;
+            };
+
+            void* SetSwapChain(void *swapchain)
+            {
+                return (m_pSwapChain = swapchain);
             };
 
             ITexture* CreateTexture( void** pD3DTextureDst, int width, int height, int numMips, ETEX_Format eTF, int flags );

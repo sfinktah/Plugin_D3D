@@ -14,6 +14,16 @@
 #undef STDMETHOD_
 #define STDMETHOD_(type,method) DECLARE_FUNCTION_PTR_(type,method)
 
+#define DECLARE_PARAMS(pthis,...) (__VA_ARGS__)
+
+#define DECLARE_FUNCTION_PTR(method)            DECLARE_MEMBER_FUNCTION_PTR_(HRESULT,method)
+#define DECLARE_FUNCTION_PTR_(rettype,method)   DECLARE_MEMBER_FUNCTION_PTR_(rettype,method)
+
+#define DECLARE_MEMBER_FUNCTION_PTR(method)         DECLARE_MEMBER_FUNCTION_PTR_(HRESULT,method)
+
+#define DECLARE_MEMBER_FUNCTION_PTR_(rettype,method) \
+    typedef rettype (STDMETHODCALLTYPE INTERFACE::*PPCAT(PPCAT(PPCAT(f, INTERFACE),_), method))
+
 // Create function pointer types
 #undef INTERFACE
 #define INTERFACE ID3D11Device

@@ -1,14 +1,18 @@
 /* D3D_Plugin - for licensing and copyright see license.txt */
 
+#define NOT_USE_CRY_MEMORY_MANAGER
 #pragma once
 
 #include <IPluginBase.h>
-#include <Game.h>
+// #include <Game.h>
 
 #include <IPluginManager.h>
 #include <CPluginBase.hpp>
 
 #include <IPluginD3D.h>
+
+
+
 
 #define PLUGIN_NAME "D3D"
 #define PLUGIN_CONSOLE_PREFIX "[" PLUGIN_NAME " " PLUGIN_TEXT "] " //!< Prefix for Logentries by this plugin
@@ -94,7 +98,9 @@ namespace D3DPlugin
                 return int( PluginManager::IM_Default );
             };
 
-            bool Init( SSystemGlobalEnvironment& env, SSystemInitParams& startupParams, IPluginBase* pPluginManager, const char* sPluginDirectory );
+			bool InitWithoutPluginManager();
+
+			bool Init( SSystemGlobalEnvironment& env, SSystemInitParams& startupParams, IPluginBase* pPluginManager, const char* sPluginDirectory );
 
             const char* GetVersion() const
             {
@@ -142,6 +148,7 @@ namespace D3DPlugin
 * Include the file "CPluginD3D.h" in front of flownode.
 */
 inline void GameWarning( const char* sFormat, ... ) PRINTF_PARAMS( 1, 2 );
+/*
 inline void GameWarning( const char* sFormat, ... )
 {
     va_list ArgList;
@@ -149,3 +156,4 @@ inline void GameWarning( const char* sFormat, ... )
     D3DPlugin::gPlugin->LogV( ILog::eWarningAlways, sFormat, ArgList );
     va_end( ArgList );
 };
+*/

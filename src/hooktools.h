@@ -6,6 +6,8 @@
 
 #pragma once
 
+#ifndef __HOOKTOOLSHCRAP__
+#define __HOOKTOOLSHCRAP__
 const DWORD dwForbiddenArea = PAGE_GUARD | PAGE_NOACCESS;
 const DWORD dwReadRights = PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY;
 const DWORD dwWriteRights = PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY;
@@ -47,7 +49,6 @@ bool CheckAccess( void* pAddress, size_t nSize )
 
 #define getVT(ptr) (IsBadWritePtr(ptr, sizeof(INT_PTR)) ? NULL : *(void***)ptr)
 #define changeVT(n, target) changeVTEx(getVT(This), n, target)
-
 #define MF_PTR(x) (*(void**)((void*)(&x)))
 #define MF_DATA(x) ((void*)x)
 
@@ -321,3 +322,5 @@ enum HookTextureMode
     HTM_INJECT,
     HTM_CREATE,
 };
+
+#endif

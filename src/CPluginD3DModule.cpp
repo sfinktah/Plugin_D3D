@@ -5,6 +5,7 @@
 #include "CPluginD3D.h"
 #include <platform_impl.h>
 #include <Nodes/G2FlowBaseNode.h>
+#error "UNUNSED!"
 
 extern "C"
 {
