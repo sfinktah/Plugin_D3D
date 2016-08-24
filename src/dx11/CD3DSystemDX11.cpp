@@ -5,7 +5,7 @@
 #include "d3d11hook.h"
 #include "../dxgi/dxgihook.h"
 #include "../dxgi/dxgiutils.hpp"
-
+#include <TwSimpleDX11.h>
 #include <CPluginD3D.h>
 
 //#pragma comment(lib, "dxerr.lib") // not needed atm
@@ -394,8 +394,10 @@ namespace D3DPlugin
 #endif
 
 		gPlugin->LogAlways( "Looking for m_pDevice" );
-        m_pDevice = FindD3D11Device( NULL, /* ( INT_PTR )gEnv->pRenderer, */ pTrialDevice );
-		gPlugin->LogAlways( "found: %p", m_pDevice );
+		// sfink
+        // m_pDevice = FindD3D11Device( NULL, /* ( INT_PTR )gEnv->pRenderer, */ pTrialDevice );
+		m_pDevice = g_D3DDev;
+		gPlugin->LogAlways( "%s:%d Found m_pDevice: %p", __FILE__, __LINE__, m_pDevice );
 
         // Hook Swap Chain
         if ( m_pDevice )
