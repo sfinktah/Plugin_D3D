@@ -178,6 +178,7 @@ bool GetD3D11DeviceData( INT_PTR* unkdata, int nDatalen, void* pParam )
     ID3D11Device* pDevice = NULL;
     ID3D11DeviceContext* pDeviceContext = NULL;
 
+	// sfink: why is it a dummy?
     // dummy swap chain description struct
     DXGI_SWAP_CHAIN_DESC sSwapChainDesc;
     ZeroMemory( &sSwapChainDesc, sizeof( DXGI_SWAP_CHAIN_DESC ) );
@@ -189,19 +190,20 @@ bool GetD3D11DeviceData( INT_PTR* unkdata, int nDatalen, void* pParam )
     sSwapChainDesc.SampleDesc.Count = 1;
 
     // create a device, device context and swap chain using the information in the scd struct
-    HRESULT hr = D3D11CreateDeviceAndSwapChain(
-                     NULL,
-                     D3D_DRIVER_TYPE_HARDWARE,
-                     NULL,
-                     NULL,
-                     NULL,
-                     NULL,
-                     D3D11_SDK_VERSION,
-                     &sSwapChainDesc,
-                     &pSwapChain,
-                     &pDevice,
-                     NULL,
-                     &pDeviceContext );
+	
+	HRESULT hr = D3D11CreateDeviceAndSwapChain(
+/* _In_opt_        IDXGIAdapter         *pAdapter,               */      NULL,                                 
+/*                 D3D_DRIVER_TYPE      DriverType,              */      D3D_DRIVER_TYPE_HARDWARE,
+/*                 HMODULE              Software,                */      NULL,
+/*                 UINT                 Flags,                   */      NULL,
+/* _In_opt_  const D3D_FEATURE_LEVEL    *pFeatureLevels,         */      NULL,
+/*                 UINT                 FeatureLevels,           */      NULL,
+/*                 UINT                 SDKVersion,              */      D3D11_SDK_VERSION,
+/* _In_opt_  const DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,         */      &sSwapChainDesc,
+/* _Out_opt_       IDXGISwapChain       **ppSwapChain,           */      &pSwapChain,
+/* _Out_opt_       ID3D11Device         **ppDevice,              */      &pDevice,
+/* _Out_opt_       D3D_FEATURE_LEVEL    *pFeatureLevel,          */      NULL,
+/* _Out_opt_       ID3D11DeviceContext  **ppImmediateContex      */      &pDeviceContext );
 
     if ( SUCCEEDED( hr ) )
     {
