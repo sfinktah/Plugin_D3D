@@ -20,6 +20,7 @@ D3DPlugin::CD3DSystem11* D3DPlugin::gD3DSystem11 = NULL;
 #define METHOD Present
 GEN_HOOK( UINT SyncInterval, UINT Flags )
 {
+	// Have DEVICE, need SWAPCHAIN
     if ( !D3DPlugin::gD3DSystem11->m_pSwapChain && D3DPlugin::gD3DSystem11->m_pDevice )
     {
         ID3D11Device* pSwapChainDevice = NULL;
@@ -28,7 +29,6 @@ GEN_HOOK( UINT SyncInterval, UINT Flags )
         if ( pSwapChainDevice == D3DPlugin::gD3DSystem11->m_pDevice )
         {
             D3DPlugin::gD3DSystem11->m_pSwapChain = This;
-
             D3DPlugin::gPlugin->LogAlways( "DXGI swap chain retrieved" );
         }
     }
@@ -58,7 +58,7 @@ GEN_HOOK( UINT SyncInterval, UINT Flags )
 #define INTERFACE ID3D11DeviceContext
 
 #define METHOD GSSetShader
-GEN_HOOK_( void, __in_opt ID3D11GeometryShader* pShader, __in_ecount_opt( NumClassInstances )  ID3D11ClassInstance* const* ppClassInstances, UINT NumClassInstances )
+GEN_HOOK_( void, __in_opt ID3D11GeometryShader* pShader, __in_ecount_opt(NumClassInstances)  ID3D11ClassInstance* const* ppClassInstances, UINT NumClassInstances)
 {
     CALL_ORGINAL_( , pShader, ppClassInstances, NumClassInstances );
 
@@ -398,8 +398,9 @@ namespace D3DPlugin
 		gPlugin->LogAlways( "Looking for m_pDevice" );
 		// sfink
         // m_pDevice = FindD3D11Device( NULL, /* ( INT_PTR )gEnv->pRenderer, */ pTrialDevice );
-		m_pDevice = g_D3DDev;
-		gPlugin->LogAlways( "%s:%d Found m_pDevice: %p", __FILE__, __LINE__, m_pDevice );
+		// Do we define g_D3DDev anywhere, why not use mP-pDevice and setdevice
+		if (m_pDevice = g_D3DDev)
+			gPlugin->LogAlways( "%s:%d Found m_pDevice: %p", __FILE__, __LINE__, m_pDevice );
 
         // Hook Swap Chain
         if ( m_pDevice )
