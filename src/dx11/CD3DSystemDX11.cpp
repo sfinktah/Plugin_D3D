@@ -384,8 +384,12 @@ namespace D3DPlugin
         m_nFeatureLevel = 0;
         m_sGPUName = "";
 
+		// Never tried disabling the internal hooking mechanism, but it might be the safer way
+		// given the problems we had co-existing with ABT
+#if !defined(D3D_DISABLE_HOOK)
         m_pDeviceCtx = NULL;
         m_pSwapChain = NULL;
+#endif
 
         void* pTrialDevice = NULL;
 #if CDK_VERSION < 350
