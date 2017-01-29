@@ -181,7 +181,7 @@ namespace D3DPlugin
         // m_pDevice = FindD3D11Device( NULL, /* ( INT_PTR )gEnv->pRenderer, */ pTrialDevice );
 		// Do we define g_D3DDev anywhere, why not use mP-pDevice and setdevice
 		if (m_pDevice = g_D3DDev)
-			gPlugin->LogAlways( "%s:%d Found m_pDevice: %p (Got it from Authority)", __FILE__, __LINE__, m_pDevice );
+			gPlugin->LogAlways( "%s:%d Found m_pDevice: %p (Got it from host)", __FILE__, __LINE__, m_pDevice );
 
         // Hook Swap Chain
         if ( m_pDevice )
